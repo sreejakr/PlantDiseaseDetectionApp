@@ -1,8 +1,13 @@
-
 # 🌿 Plant Disease Detection App 🌿
 
 This web application utilizes deep learning techniques to detect plant diseases from images of plant leaves. It provides users with instant diagnosis and treatment recommendations, helping farmers and gardeners identify and manage plant health issues effectively.
 The ipynb file has the code for the Deep Learning model.
+
+<img width="1512" alt="Screenshot 2024-05-18 at 23 18 13" src="https://github.com/sreejakr/PlantDiseaseDetectionApp/assets/58878572/5f0d088c-a6da-4f78-9ad0-62bce3dbdb10">
+
+<img width="1512" alt="Screenshot 2024-05-18 at 23 18 13" src="https://github.com/sreejakr/PlantDiseaseDetectionApp/assets/58878572/9b48a170-6375-4d72-937a-d05cd6037d51">
+
+![Uploading Screenshot 2024-05-18 at 23.19.24.png…]()
 
 ## Features:
 
@@ -18,6 +23,12 @@ The ipynb file has the code for the Deep Learning model.
 - **TensorFlow:** TensorFlow is used for training and deploying the deep learning model for plant disease detection.
 - **HTML/CSS/JavaScript:** Frontend development technologies are used to create an interactive and visually appealing user interface.
 - **Jupyter Notebook:** The Python model notebook is provided for transparency and reproducibility, allowing users to explore the model architecture and training process.
+
+## Versions used 
+- Python: 3.12.3
+- Tensorflow: 2.16.1
+- Flask: 3.0.3
+- Run it using the command: python3 "app.py"\
 
 ## Usage:
 
