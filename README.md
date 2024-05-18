@@ -25,10 +25,6 @@ The ipynb file has the code for the Deep Learning model.
 2. **View Diagnosis:** After uploading the image, the app displays the predicted disease and provides detailed diagnosis information.
 3. **Explore Treatment:** Users can explore treatment recommendations to manage the detected disease effectively.
 
-## Note:
-
-- The deep learning model used in this application is trained on a dataset of plant images labeled with various diseases.
-- The Jupyter Notebook containing the Python model is included for transparency and educational purposes. Users can explore the model architecture and training process in detail.
 
 
 ---
