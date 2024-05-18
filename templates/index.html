@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Upload and Prediction</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="left-half">
+        <div class="container">
+            <div class="title-container">
+                <h1>DIAGNOSE YOUR PLANTS HEALTH</h1>
+                <div class="plant-list">
+                    <!-- <h2>Your Plant's Health</h2> -->
+                    <p> Healthy plants contribute to cleaner air, water, and soil, support biodiversity, and provide food security. Diagnosing plant health issues enables early detection and prevention of diseases, pests, and nutrient deficiencies, thus safeguarding crop yields, preserving natural habitats, and promoting sustainable farming practices.</p>
+                    <p class = 'upload-text'>Upload an image of your leaf and let our e-doctor do the magic!</p>
+                </div>
+            </div>
+            <form method="POST" enctype="multipart/form-data" id="upload-form">
+                <label for="file" class="upload-button">Upload Image</label>
+                <input type="file" name="file" id="file" onchange="displayAndUploadImage()">
+            </form>
+        </div>
+        <img src="{{ url_for('static', filename='imgs/leaf.png') }}" alt="Left Image" class="bottom-left-image">
+    </div>
+    <div class="right-half">
+    <div class="background-image">
+        <img src="{{ url_for('static', filename='imgs/4429183.jpg') }}" alt="Background Image">
+    </div>
+    <div class="result-box" id="result-box">
+        <div class="image-container" id="image-container">
+            <!-- Image will be displayed here -->
+        </div>
+        <div class="prediction-container" id="prediction-container">
+            <div class="prediction" id="prediction">
+                <!-- Prediction will be displayed here -->
+            </div>
+            <div class="random-text" id="diagnosis">
+                <!-- Diagnosis information will be displayed here -->
+            </div>
+        </div>
+
+    </div>
+    </div>
+
+    <script>
+        const diagnosisData = {
+            "Apple___Apple_scab": "Your plant may be an Apple and seems to have Apple scab disease.",
+            "Apple___Black_rot": "Your plant may be an Apple and seems to have Black rot disease.",
+            "Apple___Cedar_apple_rust": "Your plant may be an Apple and seems to have Cedar apple rust disease.",
+            "Apple___healthy": "Your Apple plant looks healthy.",
+            "Blueberry___healthy": "Your Blueberry plant looks healthy.",
+            "Cherry_(including_sour)___Powdery_mildew": "Your plant may be a Cherry and seems to have Powdery mildew disease.",
+            "Cherry_(including_sour)___healthy": "Your Cherry plant looks healthy.",
+            "Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot": "Your plant may be Corn and seems to have Cercospora leaf spot Gray leaf spot disease.",
+            "Corn_(maize)___Common_rust_": "Your plant may be Corn and seems to have Common rust disease.",
+            "Corn_(maize)___Northern_Leaf_Blight": "Your plant may be Corn and seems to have Northern Leaf Blight disease.",
+            "Corn_(maize)___healthy": "Your Corn plant looks healthy.",
+            "Grape___Black_rot": "Your plant may be a Grape and seems to have Black rot disease.",
+            "Grape___Esca_(Black_Measles)": "Your plant may be a Grape and seems to have Esca (Black Measles) disease.",
+            "Grape___Leaf_blight_(Isariopsis_Leaf_Spot)": "Your plant may be a Grape and seems to have Leaf blight (Isariopsis Leaf Spot) disease.",
+            "Grape___healthy": "Your Grape plant looks healthy.",
+            "Orange___Haunglongbing_(Citrus_greening)": "Your plant may be an Orange and seems to have Haunglongbing (Citrus greening) disease.",
+            "Peach___Bacterial_spot": "Your plant may be a Peach and seems to have Bacterial spot disease.",
+            "Peach___healthy": "Your Peach plant looks healthy.",
+            "Pepper,_bell___Bacterial_spot": "Your plant may be a Bell Pepper and seems to have Bacterial spot disease.",
+            "Pepper,_bell___healthy": "Your Bell Pepper plant looks healthy.",
+            "Potato___Early_blight": "Your plant may be a Potato and seems to have Early blight disease.",
+            "Potato___Late_blight": "Your plant may be a Potato and seems to have Late blight disease.",
+            "Potato___healthy": "Your Potato plant looks healthy.",
+            "Raspberry___healthy": "Your Raspberry plant looks healthy.",
+            "Soybean___healthy": "Your Soybean plant looks healthy.",
+            "Squash___Powdery_mildew": "Your plant may be a Squash and seems to have Powdery mildew disease.",
+            "Strawberry___Leaf_scorch": "Your plant may be a Strawberry and seems to have Leaf scorch disease.",
+            "Strawberry___healthy": "Your Strawberry plant looks healthy.",
+            "Tomato___Bacterial_spot": "Your plant may be a Tomato and seems to have Bacterial spot disease.",
+            "Tomato___Early_blight": "Your plant may be a Tomato and seems to have Early blight disease.",
+            "Tomato___Late_blight": "Your plant may be a Tomato and seems to have Late blight disease.",
+            "Tomato___Leaf_Mold": "Your plant may be a Tomato and seems to have Leaf Mold disease.",
+            "Tomato___Septoria_leaf_spot": "Your plant may be a Tomato and seems to have Septoria leaf spot disease.",
+            "Tomato___Spider_mites Two-spotted_spider_mite": "Your plant may be a Tomato and seems to have Spider mites Two-spotted spider mite disease.",
+            "Tomato___Target_Spot": "Your plant may be a Tomato and seems to have Target Spot disease.",
+            "Tomato___Tomato_Yellow_Leaf_Curl_Virus": "Your plant may be a Tomato and seems to have Tomato Yellow Leaf Curl Virus disease.",
+            "Tomato___Tomato_mosaic_virus": "Your plant may be a Tomato and seems to have Tomato mosaic virus disease.",
+            "Tomato___healthy": "Your Tomato plant looks healthy."
+        };
+
+        const diseaseData = {
+            "Apple___Apple_scab": {
+                "disease": "Apple scab is a fungal disease caused by the pathogen Venturia inaequalis. It affects the leaves, fruit, and shoots of apple trees.",
+                "treatment": "To manage Apple scab, it's essential to practice good orchard hygiene by removing infected leaves and fruit. Fungicides can also be used preventively during the growing season to protect new growth from infection."
+            },
+            "Apple___Black_rot": {
+                "disease": "Black rot is a fungal disease caused by the pathogen Botryosphaeria obtusa. It affects the fruit, leaves, and twigs of apple trees.",
+                "treatment": "To control Black rot, remove and destroy infected plant parts promptly. Apply fungicides during the growing season, especially during wet weather conditions, to prevent further spread of the disease."
+            },
+            "Apple___Cedar_apple_rust": {
+                "disease": "Cedar apple rust is a fungal disease caused by Gymnosporangium juniperi-virginianae. It affects apple and cedar trees, causing yellow-orange lesions on leaves and fruit.",
+                "treatment": "To manage Cedar apple rust, remove cedar trees from the vicinity of apple orchards, as they serve as alternate hosts for the fungus. Fungicides can also be used to protect apple trees from infection."
+            },
+            "Apple___healthy": {
+                "disease": "Your apple plant appears to be healthy.",
+                "treatment": "Continue to monitor your plant's health and practice good orchard management techniques to prevent diseases."
+            },
+            "Blueberry___healthy": {
+                "disease": "Your blueberry plant appears to be healthy.",
+                "treatment": "Continue to monitor your plant's health and provide appropriate care, including proper irrigation and fertilization."
+            },
+            "Cherry_(including_sour)___Powdery_mildew": {
+                "disease": "Powdery mildew is a fungal disease caused by various species of the order Erysiphales. It affects the leaves, shoots, and fruit of cherry trees, causing a powdery white coating.",
+                "treatment": "To manage Powdery mildew, ensure good air circulation around the cherry trees and avoid overhead watering. Fungicides can be applied as a preventive measure during the growing season."
+            },
+            "Cherry_(including_sour)___healthy": {
+                "disease": "Your cherry plant appears to be healthy.",
+                "treatment": "Continue to monitor your plant's health and provide appropriate care, including proper irrigation and pruning."
+            },
+            "Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot": {
+                "disease": "Cercospora leaf spot, also known as Gray leaf spot, is a fungal disease caused by the pathogen Cercospora zeae-maydis. It affects the leaves of corn plants, causing small, dark spots with gray centers.",
+                "treatment": "To manage Cercospora leaf spot, practice crop rotation and remove corn debris from the field after harvest. Fungicides can be applied preventively during the growing season."
+            },
+            "Corn_(maize)___Common_rust_": {
+                "disease": "Common rust is a fungal disease caused by Puccinia sorghi. It affects the leaves of corn plants, causing orange to brown pustules.",
+                "treatment": "To control Common rust, plant resistant corn varieties and practice crop rotation. Fungicides can be used if necessary, especially during periods of high humidity."
+            },
+            "Corn_(maize)___Northern_Leaf_Blight": {
+                "disease": "Northern Leaf Blight is a fungal disease caused by the pathogen Exserohilum turcicum. It affects the leaves of corn plants, causing elliptical lesions with tan centers and dark borders.",
+                "treatment": "To manage Northern Leaf Blight, plant resistant corn varieties and avoid planting in fields with a history of the disease. Fungicides can be used if necessary, especially during periods of high humidity."
+            },
+            "Corn_(maize)___healthy": {
+                "disease": "Your corn plant appears to be healthy.",
+                "treatment": "Continue to monitor your plant's health and provide appropriate care, including proper irrigation and fertilization."
+            },
+            "Grape___Black_rot": {
+                "disease": "Black rot is a fungal disease caused by the pathogen Guignardia bidwellii. It affects the leaves, fruit, and shoots of grapevines.",
+                "treatment": "To control Black rot, remove and destroy infected plant parts promptly. Apply fungicides during the growing season to protect new growth from infection."
+            },
+            "Grape___Esca_(Black_Measles)": {
+                "disease": "Esca, also known as Black Measles, is a complex disease caused by several fungal pathogens. It affects the wood, leaves, and fruit of grapevines.",
+                "treatment": "To manage Esca, remove and destroy infected wood during pruning. Avoid wounding the vines and consider applying fungicides to protect against infection."
+            },
+            "Grape___Leaf_blight_(Isariopsis_Leaf_Spot)": {
+                "disease": "Leaf blight, also known as Isariopsis Leaf Spot, is caused by the fungus Pseudopezicula tetraspora. It affects the leaves of grapevines, causing brown spots and blight.",
+                "treatment": "To control Leaf blight, ensure good air circulation around the grapevines and avoid overhead watering. Fungicides can be applied preventively during the growing season."
+            },
+            "Grape___healthy": {
+                "disease": "Your grapevine appears to be healthy.",
+                "treatment": "Continue to monitor your plant's health and provide appropriate care, including proper irrigation and fertilization."
+            },
+            "Orange___Haunglongbing_(Citrus_greening)": {
+                "disease": "Huanglongbing (HLB), also known as Citrus Greening, is a bacterial disease caused by Candidatus Liberibacter spp. It affects citrus trees, causing yellow shoots, mottled leaves, and bitter fruit.",
+                "treatment": "To manage HLB, remove and destroy infected trees to prevent the spread of the bacteria. Use disease-free planting material and control the population of the psyllid insect vector with insecticides."
+            },
+            "Peach___Bacterial_spot": {
+                "disease": "Bacterial spot is caused by the bacterium Xanthomonas campestris pv. pruni. It affects the leaves, fruit, and twigs of peach trees.",
+                "treatment": "To control Bacterial spot, apply copper-based bactericides during the growing season. Remove and destroy infected plant parts to reduce the bacterial load in the orchard."
+            },
+            "Peach___healthy": {
+                "disease": "Your peach plant appears to be healthy.",
+                "treatment": "Continue to monitor your plant's health and provide appropriate care, including proper irrigation and fertilization."
+            },
+            "Pepper,_bell___Bacterial_spot": {
+                "disease": "Bacterial spot in bell peppers is caused by the bacterium Xanthomonas campestris pv. vesicatoria. It affects the leaves and fruit of pepper plants.",
+                "treatment": "To manage Bacterial spot, use disease-free seeds and transplants. Apply copper-based bactericides during the growing season and remove infected plant debris."
+            },
+            "Pepper,_bell___healthy": {
+                "disease": "Your bell pepper plant appears to be healthy.",
+                "treatment": "Continue to monitor your plant's health and provide appropriate care, including proper irrigation and fertilization."
+            },
+            "Potato___Early_blight": {
+                "disease": "Early blight is a fungal disease caused by the pathogen Alternaria solani. It affects the leaves, stems, and tubers of potato plants.",
+                "treatment": "To control Early blight, practice crop rotation and remove potato debris from the field. Apply fungicides preventively during the growing season."
+            },
+            "Potato___Late_blight": {
+                "disease": "Late blight is a fungal disease caused by the pathogen Phytophthora infestans. It affects the leaves, stems, and tubers of potato plants, causing rapid decay.",
+                "treatment": "To manage Late blight, practice crop rotation and remove infected plant material promptly. Apply fungicides during the growing season, especially during wet weather conditions."
+            },
+            "Potato___healthy": {
+                "disease": "Your potato plant appears to be healthy.",
+                "treatment": "Continue to monitor your plant's health and provide appropriate care, including proper irrigation and fertilization."
+            },
+            "Raspberry___healthy": {
+                "disease": "Your raspberry plant appears to be healthy.",
+                "treatment": "Continue to monitor your plant's health and provide appropriate care, including proper irrigation and fertilization."
+            },
+            "Soybean___healthy": {
+                "disease": "Your soybean plant appears to be healthy.",
+                "treatment": "Continue to monitor your plant's health and provide appropriate care, including proper irrigation and fertilization."
+            },
+            "Squash___Powdery_mildew": {
+                "disease": "Powdery mildew in squash is caused by various fungal pathogens, including Podosphaera xanthii. It affects the leaves, stems, and fruit, causing a powdery white coating.",
+                "treatment": "To manage Powdery mildew, ensure good air circulation around the plants and avoid overhead watering. Fungicides can be applied preventively during the growing season."
+            },
+            "Strawberry___Leaf_scorch": {
+                "disease": "Leaf scorch in strawberries is caused by the fungal pathogen Diplocarpon earlianum. It affects the leaves, causing irregular purple or brown spots.",
+                "treatment": "To control Leaf scorch, remove and destroy infected leaves and debris. Apply fungicides during the growing season to protect new growth from infection."
+            },
+            "Strawberry___healthy": {
+                "disease": "Your strawberry plant appears to be healthy.",
+                "treatment": "Continue to monitor your plant's health and provide appropriate care, including proper irrigation and fertilization."
+            },
+            "Tomato___Bacterial_spot": {
+                "disease": "Bacterial spot in tomatoes is caused by several species of Xanthomonas. It affects the leaves, stems, and fruit, causing dark, water-soaked spots.",
+                "treatment": "To manage Bacterial spot, use disease-free seeds and transplants. Apply copper-based bactericides during the growing season and remove infected plant debris."
+            },
+            "Tomato___Early_blight": {
+                "disease": "Early blight is a fungal disease caused by the pathogen Alternaria solani. It affects the leaves, stems, and fruit of tomato plants.",
+                "treatment": "To control Early blight, practice crop rotation and remove tomato debris from the field. Apply fungicides preventively during the growing season."
+            },
+            "Tomato___Late_blight": {
+                "disease": "Late blight is a fungal disease caused by the pathogen Phytophthora infestans. It affects the leaves, stems, and fruit of tomato plants, causing rapid decay.",
+                "treatment": "To manage Late blight, practice crop rotation and remove infected plant material promptly. Apply fungicides during the growing season, especially during wet weather conditions."
+            },
+            "Tomato___Leaf_Mold": {
+                "disease": "Leaf Mold in tomatoes is caused by the fungal pathogen Passalora fulva. It affects the leaves, causing yellow spots and mold growth on the undersides.",
+                "treatment": "To control Leaf Mold, ensure good air circulation and avoid overhead watering. Apply fungicides preventively during the growing season."
+            },
+            "Tomato___Septoria_leaf_spot": {
+                "disease": "Septoria leaf spot is a fungal disease caused by Septoria lycopersici. It affects the leaves of tomato plants, causing small, circular spots with dark borders.",
+                "treatment": "To manage Septoria leaf spot, remove and destroy infected leaves. Apply fungicides during the growing season to protect new growth from infection."
+            },
+            "Tomato___Spider_mites Two-spotted_spider_mite": {
+                "disease": "Two-spotted spider mites (Tetranychus urticae) are tiny pests that cause stippling and webbing on tomato leaves, leading to yellowing and leaf drop.",
+                "treatment": "To control spider mites, use insecticidal soaps or horticultural oils. Encourage natural predators like ladybugs and maintain adequate humidity to discourage mite infestations."
+            },
+            "Tomato___Target_Spot": {
+                "disease": "Target Spot is a fungal disease caused by Corynespora cassiicola. It affects the leaves, stems, and fruit of tomato plants, causing dark, target-like spots.",
+                "treatment": "To manage Target Spot, remove and destroy infected plant parts. Apply fungicides during the growing season to protect new growth from infection."
+            },
+            "Tomato___Tomato_Yellow_Leaf_Curl_Virus": {
+                "disease": "Tomato Yellow Leaf Curl Virus (TYLCV) is a viral disease transmitted by whiteflies. It causes yellowing, curling, and stunting of tomato leaves.",
+                "treatment": "To control TYLCV, use resistant tomato varieties and manage whitefly populations with insecticides or biological control agents. Remove infected plants to prevent further spread."
+            },
+            "Tomato___Tomato_mosaic_virus": {
+                "disease": "Tomato mosaic virus (ToMV) is a viral disease that causes mottling, yellowing, and stunted growth in tomato plants.",
+                "treatment": "To manage ToMV, use resistant tomato varieties and practice good sanitation by cleaning tools and equipment. Remove infected plants and control insect vectors to prevent the spread of the virus."
+            },
+            "Tomato___healthy": {
+                "disease": "Your tomato plant appears to be healthy.",
+                "treatment": "Continue to monitor your plant's health and provide appropriate care, including proper irrigation, fertilization, and pest management."
+            }
+        };
+    
+
+        function displayAndUploadImage() {
+            console.log("Image uploaded");
+            const fileInput = document.getElementById('file');
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const imageContainer = document.getElementById('image-container');
+                const imgElement = document.createElement('img');
+                imgElement.src = e.target.result;
+                imgElement.classList.add('uploaded-image');
+                imageContainer.innerHTML = '';
+                imageContainer.appendChild(imgElement);
+
+                // Show the result box when image is uploaded
+                document.getElementById('result-box').style.display = 'block';
+
+                // Upload the image for prediction
+                const form = document.getElementById('upload-form');
+                const formData = new FormData(form);
+                formData.append('file', file); // Append the uploaded file to the form data
+                fetch('/', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.text())
+                .then(prediction => {
+                    console.log("Prediction received:", prediction);
+                    const predictionContainer = document.getElementById('prediction');
+                    const diagnosisContainer = document.getElementById('diagnosis');
+                    const diseaseInfo = diseaseData[prediction] || { disease: "No information available", treatment: "" };
+                    const disease = diagnosisData[prediction] || "No information available";
+
+                    predictionContainer.innerHTML = `<h4 style="color: green; font-family: 'Arial', sans-serif;">🍃 ${disease} 🍃</h4>`;
+                    diagnosisContainer.innerHTML = `<p><strong>Diagnosis:</strong> ${diseaseInfo.disease}</p><p><strong>Treatment:</strong> ${diseaseInfo.treatment}</p>`;
+
+                    const imageContainer = document.getElementById('image-container');
+                    imageContainer.style.marginTop = '20px'; 
+                })
+                .catch(error => console.error('Error:', error));
+            }
+            reader.readAsDataURL(file);
+}
+
+
+    </script>
+
+
+</body>
+</html>
