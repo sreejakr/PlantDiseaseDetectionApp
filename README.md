@@ -26,7 +26,7 @@ The ipynb file has the code for the Deep Learning model.
 3. **Explore Treatment:** Users can explore treatment recommendations to manage the detected disease effectively.
 
 
+## Note:
+The deep learning model used in this application is trained on a dataset of plant images labeled with various diseases.
+The Jupyter Notebook containing the Python model is included for transparency and educational purposes. Users can explore the model architecture and training process in detail
 
----
-
-This description highlights the key features, technologies used, and usage instructions for your app, along with a note about the included Jupyter Notebook for the Python model. Feel free to customize it further to suit your preferences!
