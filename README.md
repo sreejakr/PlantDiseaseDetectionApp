@@ -5,9 +5,7 @@ The ipynb file has the code for the Deep Learning model.
 
 <img width="1512" alt="Screenshot 2024-05-18 at 23 18 13" src="https://github.com/sreejakr/PlantDiseaseDetectionApp/assets/58878572/5f0d088c-a6da-4f78-9ad0-62bce3dbdb10">
 
-<img width="1512" alt="Screenshot 2024-05-18 at 23 18 13" src="https://github.com/sreejakr/PlantDiseaseDetectionApp/assets/58878572/9b48a170-6375-4d72-937a-d05cd6037d51">
-
-![Uploading Screenshot 2024-05-18 at 23.19.24.png…]()
+<img width="1512" alt="Screenshot 2024-05-18 at 23 19 24" src="https://github.com/sreejakr/PlantDiseaseDetectionApp/assets/58878572/53b37de3-d9df-47e2-acca-b654e73a6967">
 
 ## Features:
 
