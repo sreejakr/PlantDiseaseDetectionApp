@@ -1,5 +1,5 @@
 
-# Plant Disease Detection App
+# 🌿 Plant Disease Detection App 🌿
 
 This web application utilizes deep learning techniques to detect plant diseases from images of plant leaves. It provides users with instant diagnosis and treatment recommendations, helping farmers and gardeners identify and manage plant health issues effectively.
 The ipynb file has the code for the Deep Learning model.
